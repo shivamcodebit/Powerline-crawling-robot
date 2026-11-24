@@ -11,31 +11,31 @@ The system features real hardware integration with the **STM32 Nucleo-F446RE**, 
 ```mermaid
 flowchart TD
     subgraph UI ["Operator Consoles (Browser / Tablet)"]
-        D1["Dashboard 1: Robot Control<br>(Port 8002)<br>• Vertical Crawler Joystick<br>• Independent Gripper Bars<br>• Servo Sliders & Presets<br>• Latched Emergency Stop"]
-        D2["Dashboard 2: Live Monitoring<br>(Port 8003)<br>• Low-Latency Camera Feed<br>• 4x Encoder Counts & RPM<br>• MPU9250 Attitude Horizon<br>• Dual INA219 Power Sparklines"]
+        D1["Dashboard 1: Robot Control<br/>Port 8002<br/>- Vertical Crawler Joystick<br/>- Independent Gripper Bars<br/>- Servo Sliders & Presets<br/>- Latched Emergency Stop"]
+        D2["Dashboard 2: Live Monitoring<br/>Port 8003<br/>- Low-Latency Camera Feed<br/>- 4x Encoder Counts & RPM<br/>- MPU9250 Attitude Horizon<br/>- Dual INA219 Power Sparklines"]
     end
 
     subgraph RPI ["Raspberry Pi 4B (Backend Server)"]
-        WS["WebSocket & REST Manager<br>(FastAPI / Uvicorn)"]
+        WS["WebSocket & REST Manager<br/>FastAPI / Uvicorn"]
         SAFETY["Safety Supervisor & Client Watchdog (700ms)"]
-        CAM["Camera Streamer<br>(Picamera2 / libcamera / Diagnostic)"]
-        SERIAL["Serial Communication Manager<br>(115200 Baud, Auto-Reconnect)"]
+        CAM["Camera Streamer<br/>Picamera2 / libcamera / Diagnostic"]
+        SERIAL["Serial Communication Manager<br/>115200 Baud, Auto-Reconnect"]
     end
 
     subgraph MCU ["STM32 Nucleo-F446RE (Arduino IDE / STM32duino)"]
-        FW["Firmware Safety State Machine<br>• 500ms Hardware Watchdog<br>• Latching E-Stop<br>• Neutral Arming Interlock"]
-        MOTORS["Cytron MDD10A Drivers (TIM1 20kHz PWM)<br>• Crawler A (PA8/PC0) & B (PA9/PC1)<br>• Gripper A (PA10/PC2) & B (PA11/PC3)"]
-        SERVOS["Servos 1 & 2 (PA0 & PA6)<br>50Hz Clamped Safe PWM"]
-        ENCS["4x Quadrature Encoders<br>• ENC1 (PB6/PB7 - TIM4 Hardware)<br>• ENC2 (PC6/PC7 - EXTI)<br>• WENC1 (PB4/PB5 - EXTI)<br>• WENC2 (PA15/PB3 - EXTI)"]
-        I2C["I2C1 Sensor Bus (PB8/PB9)<br>• MPU-9250 IMU<br>• INA219 #1 (Bus 1)<br>• INA219 #2 (Bus 2)"]
+        FW["Firmware Safety State Machine<br/>- 500ms Hardware Watchdog<br/>- Latching E-Stop<br/>- Neutral Arming Interlock"]
+        MOTORS["Cytron MDD10A Drivers (TIM1 20kHz PWM)<br/>- Crawler A (PA8/PC0) & B (PA9/PC1)<br/>- Gripper A (PA10/PC2) & B (PA11/PC3)"]
+        SERVOS["Servos 1 & 2 (PA0 & PA6)<br/>50Hz Clamped Safe PWM"]
+        ENCS["4x Quadrature Encoders<br/>- ENC1 (PB6/PB7 - TIM4 Hardware)<br/>- ENC2 (PC6/PC7 - EXTI)<br/>- WENC1 (PB4/PB5 - EXTI)<br/>- WENC2 (PA15/PB3 - EXTI)"]
+        I2C["I2C1 Sensor Bus (PB8/PB9)<br/>- MPU-9250 IMU<br/>- INA219 #1 (Bus 1)<br/>- INA219 #2 (Bus 2)"]
     end
 
-    D1 <==>|"WebSockets & REST"| WS
-    D2 <==>|"WebSockets & MJPEG"| WS
+    D1 <-->|"WebSockets & REST"| WS
+    D2 <-->|"WebSockets & MJPEG"| WS
     WS <--> SAFETY
     WS <--> CAM
     WS <--> SERIAL
-    SERIAL <==>|"USB VCP / UART 115200 Baud"| FW
+    SERIAL <-->|"USB VCP / UART 115200 Baud"| FW
     FW --> MOTORS
     FW --> SERVOS
     FW --> ENCS
