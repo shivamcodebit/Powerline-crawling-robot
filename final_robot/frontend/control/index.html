@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Robot Control — IIT Mandi Power Line Crawler</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header Navigation Bar -->
+    <header class="header-bar">
+        <div class="brand">
+            <div class="brand-badge">IITM</div>
+            <div class="brand-info">
+                <h1>Power Line Crawler Robot</h1>
+                <p>STM32 Nucleo-F446RE &bull; Control Console</p>
+            </div>
+        </div>
+
+        <div class="header-status">
+            <div class="pill pill-link">
+                <span id="dot-link" class="dot dot-orange"></span>
+                <span id="badge-link">Connecting...</span>
+            </div>
+            <div class="pill pill-state">
+                <span class="pill-label">STATUS</span>
+                <span id="badge-state" class="state-val state-disarmed">DISARMED</span>
+            </div>
+            <div class="pill pill-wdog">
+                <span id="badge-wdog">WDOG: OK</span>
+            </div>
+            <a href="http://localhost:8003" id="link-monitor" class="nav-button">
+                Live Monitor (8003) ↗
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Responsive Grid -->
+    <main class="control-container">
+
+        <!-- Column 1: Crawler Joystick -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Crawler Drive</h2>
+                <span class="sub-label">PA8/PC0 &bull; PA9/PC1</span>
+            </div>
+
+            <div class="joystick-wrapper">
+                <div class="joystick-canvas-container">
+                    <canvas id="crawler-joystick" width="200" height="320"></canvas>
+                </div>
+
+                <div class="metric-display">
+                    <div id="crawler-speed-val" class="metric-number">0%</div>
+                    <div id="crawler-dir-val" class="metric-caption">STOPPED</div>
+                </div>
+
+                <div class="inversion-controls">
+                    <button id="btn-invert-ca" class="btn-toggle">Crawler A: Normal</button>
+                    <button id="btn-invert-cb" class="btn-toggle active">Crawler B: Inverted</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Column 2: Independent Grippers -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Gripper Motors</h2>
+                <span class="sub-label">Independent &bull; Sign-Magnitude</span>
+            </div>
+
+            <div class="grippers-wrapper">
+                <!-- Gripper A -->
+                <div class="gripper-box">
+                    <div class="gripper-header">
+                        <span class="gripper-title">Gripper Motor A (PA10/PC2)</span>
+                        <span id="grip-a-val" class="speed-value">0%</span>
+                    </div>
+                    <div class="slider-canvas-container">
+                        <canvas id="gripper-a-canvas" width="420" height="48"></canvas>
+                    </div>
+                    <div class="gripper-footer">
+                        <span class="guidance">Drag left for reverse, right for forward</span>
+                        <button id="btn-stop-grip-a" class="btn-stop">Stop A</button>
+                    </div>
+                </div>
+
+                <!-- Gripper B -->
+                <div class="gripper-box">
+                    <div class="gripper-header">
+                        <span class="gripper-title">Gripper Motor B (PA11/PC3)</span>
+                        <span id="grip-b-val" class="speed-value">0%</span>
+                    </div>
+                    <div class="slider-canvas-container">
+                        <canvas id="gripper-b-canvas" width="420" height="48"></canvas>
+                    </div>
+                    <div class="gripper-footer">
+                        <span class="guidance">Drag left for reverse, right for forward</span>
+                        <button id="btn-stop-grip-b" class="btn-stop">Stop B</button>
+                    </div>
+                </div>
+
+                <div class="info-note">
+                    <strong>Safety Interlock:</strong> Grippers automatically return to 0% upon release. Dual grippers are controlled independently to prevent line jams.
+                </div>
+            </div>
+        </section>
+
+        <!-- Column 3: Servos & Safety Interlocks -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Servos & Safety</h2>
+                <span class="sub-label">Hardware Interlocked</span>
+            </div>
+
+            <div class="safety-wrapper">
+                <!-- Servo 1 -->
+                <div class="servo-row">
+                    <div class="servo-info">
+                        <span class="servo-title">Servo 1 (PA0)</span>
+                        <span id="servo-1-deg" class="servo-deg">90°</span>
+                    </div>
+                    <input id="servo-1-slider" type="range" class="clean-slider" min="10" max="170" value="90">
+                    <div class="servo-btns">
+                        <button id="btn-s1-center" class="btn-secondary">Center (90°)</button>
+                        <button id="btn-servo-1-toggle" class="btn-secondary">Enabled</button>
+                    </div>
+                </div>
+
+                <!-- Servo 2 -->
+                <div class="servo-row">
+                    <div class="servo-info">
+                        <span class="servo-title">Servo 2 (PA6)</span>
+                        <span id="servo-2-deg" class="servo-deg">90°</span>
+                    </div>
+                    <input id="servo-2-slider" type="range" class="clean-slider" min="10" max="170" value="90">
+                    <div class="servo-btns">
+                        <button id="btn-s2-center" class="btn-secondary">Center (90°)</button>
+                        <button id="btn-servo-2-toggle" class="btn-secondary">Enabled</button>
+                    </div>
+                </div>
+
+                <!-- Master E-Stop -->
+                <button id="btn-estop" class="btn-estop">
+                    EMERGENCY STOP
+                </button>
+
+                <!-- Arming Controls -->
+                <div class="arm-row">
+                    <button id="btn-arm" class="btn-arm">⚡ Arm Robot</button>
+                    <button id="btn-disarm" class="btn-disarm">Disarm</button>
+                </div>
+
+                <button id="btn-reset-estop" class="btn-reset-estop">
+                    Reset E-Stop Latch
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Clean Footer -->
+    <footer class="footer-strip">
+        <span id="footer-time">MCU: 0 ms &bull; Seq: 0</span>
+        <span>IIT Mandi Power Line Inspection Robot</span>
+        <span id="footer-packets">Link Active</span>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/static/js/joystick.js"></script>
+    <script src="/static/js/gripper_slider.js"></script>
+    <script src="/static/js/servo_control.js"></script>
+    <script src="/static/js/control_app.js"></script>
+    <script>
+        const monLink = document.getElementById('link-monitor');
+        if (monLink) {
+            monLink.href = `http://${window.location.hostname}:8003`;
+        }
+    </script>
+</body>
+</html>

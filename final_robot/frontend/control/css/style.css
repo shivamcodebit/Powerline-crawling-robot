@@ -1,0 +1,575 @@
+/* ==========================================================================
+   IIT Mandi Power Line Crawler Robot - Clean Modern Control Dashboard
+   Fully Responsive & Mobile-Optimized. Zero-Blinking, Modern Clean Typography.
+   ========================================================================== */
+
+:root {
+  --bg-body: #090d16;
+  --bg-card: #111827;
+  --bg-card-subtle: #0f172a;
+  --border-card: #1f2937;
+  --border-focus: #38bdf8;
+
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --accent-cyan: #0ea5e9;
+  --accent-green: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Roboto Mono', Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------- Header Bar ---------------- */
+.header-bar {
+  background: #0d131f;
+  border-bottom: 1px solid var(--border-card);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-badge {
+  background: var(--accent-cyan);
+  color: #041226;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.brand-info h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.2px;
+}
+
+.brand-info p {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.pill-label {
+  color: var(--text-dim);
+  font-size: 10px;
+  margin-right: 2px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot-green { background-color: var(--accent-green); }
+.dot-orange { background-color: var(--accent-amber); }
+.dot-red { background-color: var(--accent-red); }
+
+.state-val {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.state-armed {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+.state-disarmed {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+.state-estop {
+  background: rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.nav-button {
+  background: transparent;
+  color: var(--accent-cyan);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+.nav-button:hover {
+  background: rgba(14, 165, 233, 0.1);
+  border-color: var(--accent-cyan);
+}
+
+/* ---------------- Main Container & Cards ---------------- */
+.control-container {
+  max-width: 1360px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px 16px;
+  display: grid;
+  grid-template-columns: 280px 1fr 340px;
+  gap: 16px;
+  flex: 1;
+}
+
+@media (max-width: 1024px) {
+  .control-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-card);
+}
+
+.card-header h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.2px;
+}
+
+.sub-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+/* ---------------- Column 1: Crawler Joystick ---------------- */
+.joystick-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  justify-content: center;
+}
+
+.joystick-canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.joystick-canvas-container canvas {
+  background: #090e17;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  touch-action: none;
+  cursor: grab;
+  max-width: 100%;
+  height: auto;
+}
+.joystick-canvas-container canvas:active {
+  cursor: grabbing;
+}
+
+.metric-display {
+  text-align: center;
+}
+
+.metric-number {
+  font-size: 36px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.metric-caption {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inversion-controls {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-toggle {
+  flex: 1;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: var(--text-muted);
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-toggle.active {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--accent-amber);
+  color: #fbbf24;
+}
+
+/* ---------------- Column 2: Independent Grippers ---------------- */
+.grippers-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.gripper-box {
+  background: #0b111c;
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.gripper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.gripper-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.speed-value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.slider-canvas-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.slider-canvas-container canvas {
+  width: 100%;
+  height: 48px;
+  background: #070c14;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  touch-action: none;
+  cursor: ew-resize;
+}
+
+.gripper-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.guidance {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.btn-stop {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-stop:hover, .btn-stop:active {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fff;
+}
+
+.info-note {
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid rgba(14, 165, 233, 0.2);
+  color: #bae6fd;
+  font-size: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+/* ---------------- Column 3: Servos & Safety ---------------- */
+.safety-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.servo-row {
+  background: #0b111c;
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.servo-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.servo-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.servo-deg {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.clean-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: #1e293b;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.clean-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  border: 2px solid #fff;
+  cursor: pointer;
+}
+
+.clean-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  border: 2px solid #fff;
+  cursor: pointer;
+}
+
+.servo-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn-secondary {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: var(--text-muted);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  color: var(--text-main);
+  border-color: var(--accent-cyan);
+}
+
+/* Master E-Stop Button */
+.btn-estop {
+  background: #dc2626;
+  border: none;
+  color: #ffffff;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  min-height: 52px;
+}
+.btn-estop:hover {
+  background: #ef4444;
+}
+.btn-estop:active {
+  transform: scale(0.98);
+}
+
+/* Arm & Disarm Buttons */
+.arm-row {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-arm {
+  flex: 2;
+  background: #059669;
+  border: none;
+  color: #ffffff;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 48px;
+}
+.btn-arm:hover {
+  background: #10b981;
+}
+
+.btn-disarm {
+  flex: 1;
+  background: #334155;
+  border: none;
+  color: var(--text-main);
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 48px;
+}
+.btn-disarm:hover {
+  background: #475569;
+}
+
+.btn-reset-estop {
+  background: transparent;
+  border: 1px solid #475569;
+  color: var(--text-muted);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 44px;
+}
+.btn-reset-estop:hover {
+  border-color: var(--text-main);
+  color: var(--text-main);
+}
+
+/* ---------------- Footer Strip ---------------- */
+.footer-strip {
+  background: #0d131f;
+  border-top: 1px solid var(--border-card);
+  padding: 10px 20px;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Mobile specific improvements */
+@media (max-width: 640px) {
+  .header-bar {
+    padding: 10px 14px;
+  }
+  .brand-info h1 {
+    font-size: 15px;
+  }
+  .control-container {
+    padding: 12px 10px;
+    gap: 12px;
+  }
+  .card {
+    padding: 14px;
+  }
+  .footer-strip {
+    flex-direction: column;
+    text-align: center;
+  }
+}

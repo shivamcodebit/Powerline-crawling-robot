@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Live Telemetry & Diagnostics — IIT Mandi Power Line Crawler</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header Navigation Bar -->
+    <header class="header-bar">
+        <div class="brand">
+            <div class="brand-badge">IITM</div>
+            <div class="brand-info">
+                <h1>Live Robot Monitoring</h1>
+                <p>STM32 Nucleo-F446RE &bull; Live Telemetry &amp; Diagnostics</p>
+            </div>
+        </div>
+
+        <div class="header-status">
+            <div class="pill">
+                <span id="mon-dot-link" class="dot dot-orange"></span>
+                <span id="mon-badge-link">Connecting...</span>
+            </div>
+            <div class="pill">
+                <span class="pill-label">STATE</span>
+                <span id="mon-badge-state" class="state-val state-disarmed">DISARMED</span>
+            </div>
+            <div class="pill">
+                <span id="mon-badge-wdog">WDOG: OK</span>
+            </div>
+            <div class="pill">
+                <span class="pill-label">RATE</span>
+                <strong id="mon-badge-rate" style="color: var(--accent-cyan);">0.0 Hz</strong>
+            </div>
+            <a href="http://localhost:8002" id="link-control" class="nav-button">
+                Robot Control (8002) ↗
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Monitoring Layout Grid -->
+    <main class="monitor-container">
+
+        <!-- 1. LIVE CAMERA FEED -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Optical Inspection Camera</h2>
+                <span id="camera-status-text" class="sub-label">Connecting Stream...</span>
+            </div>
+
+            <div class="camera-wrapper">
+                <img id="camera-feed" class="camera-img" src="/video_feed" alt="Live Camera Stream">
+            </div>
+
+            <div class="camera-toolbar">
+                <span class="camera-note">Low-Latency MJPEG Stream</span>
+                <div class="camera-btn-group">
+                    <button id="btn-cam-start" class="btn-sm">▶ Start</button>
+                    <button id="btn-cam-stop" class="btn-sm">⏸ Pause</button>
+                    <button id="btn-cam-reconnect" class="btn-sm">🔄 Reconnect</button>
+                    <button id="btn-cam-flip" class="btn-sm">🔄 Flip 180°</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ATTITUDE & IMU -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Attitude &amp; IMU (MPU-9250)</h2>
+                <span id="imu-addr" class="sub-label">0x68 (Online)</span>
+            </div>
+
+            <div class="imu-wrapper">
+                <div class="attitude-canvas-box">
+                    <canvas id="attitude-canvas" width="180" height="180"></canvas>
+                    <span class="canvas-caption">Artificial Horizon</span>
+                </div>
+
+                <div class="imu-data-list">
+                    <div class="data-row">
+                        <span class="data-key">Pitch &amp; Roll</span>
+                        <span class="data-val">
+                            P: <strong id="imu-pitch" style="color: var(--accent-amber);">0.0°</strong> &bull; 
+                            R: <strong id="imu-roll" style="color: var(--accent-cyan);">0.0°</strong>
+                        </span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-key">Accelerometer (m/s²)</span>
+                        <span class="data-val font-mono">
+                            <span id="imu-ax">0.00</span>, <span id="imu-ay">0.00</span>, <span id="imu-az">9.81</span>
+                        </span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-key">Gyroscope (°/s)</span>
+                        <span class="data-val font-mono">
+                            <span id="imu-gx">0.00</span>, <span id="imu-gy">0.00</span>, <span id="imu-gz">0.00</span>
+                        </span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-key">Internal Temperature</span>
+                        <span id="imu-temp" class="data-val" style="color: var(--accent-green);">25.0 °C</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. MOTORS & QUADRATURE ENCODERS -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Motors &amp; Encoders</h2>
+                <span class="sub-label">4 Channels &bull; TIM4 + EXTI</span>
+            </div>
+
+            <!-- Commanded Motors Mini Summary -->
+            <div class="motors-tiles">
+                <div class="tile">
+                    <span class="tile-label">Crawl A (PA8)</span>
+                    <strong id="mot-crawl-a" class="tile-val">0%</strong>
+                </div>
+                <div class="tile">
+                    <span class="tile-label">Crawl B (PA9)</span>
+                    <strong id="mot-crawl-b" class="tile-val">0%</strong>
+                </div>
+                <div class="tile">
+                    <span class="tile-label">Grip A (PA10)</span>
+                    <strong id="mot-grip-a" class="tile-val">0%</strong>
+                </div>
+                <div class="tile">
+                    <span class="tile-label">Grip B (PA11)</span>
+                    <strong id="mot-grip-b" class="tile-val">0%</strong>
+                </div>
+            </div>
+
+            <!-- Quadrature Encoders Table -->
+            <div class="table-responsive">
+                <table class="clean-table">
+                    <thead>
+                        <tr>
+                            <th>Encoder</th>
+                            <th>Pins</th>
+                            <th>Raw Count</th>
+                            <th>Speed (RPM)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Crawler A (Wheel)</strong></td>
+                            <td class="text-dim">PB6/PB7</td>
+                            <td id="enc1-count" class="font-mono text-cyan">0</td>
+                            <td id="enc1-rpm" class="font-mono">0.0 RPM</td>
+                            <td><span id="enc1-status" class="badge-cal">CALIBRATED (216:1)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Crawler B (Wheel)</strong></td>
+                            <td class="text-dim">PC6/PC7</td>
+                            <td id="enc2-count" class="font-mono text-cyan">0</td>
+                            <td id="enc2-rpm" class="font-mono">0.0 RPM</td>
+                            <td><span id="enc2-status" class="badge-cal">CALIBRATED (216:1)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gripper A (Angle)</strong></td>
+                            <td class="text-dim">PB4/PB5</td>
+                            <td id="wenc1-count" class="font-mono text-cyan">0</td>
+                            <td id="wenc1-rpm" class="font-mono">0.0 RPM</td>
+                            <td><span id="wenc1-status" class="badge-cal">CALIBRATED (174:1)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gripper B (Angle)</strong></td>
+                            <td class="text-dim">PA15/PB3</td>
+                            <td id="wenc2-count" class="font-mono text-cyan">0</td>
+                            <td id="wenc2-rpm" class="font-mono">0.0 RPM</td>
+                            <td><span id="wenc2-status" class="badge-cal">CALIBRATED (174:1)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 4. DUAL INA219 POWER MONITORS -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Dual INA219 Power Monitors</h2>
+                <span class="sub-label">I2C PB8/PB9</span>
+            </div>
+
+            <div class="power-cards-grid">
+                <!-- Bus 1 (Logic) -->
+                <div class="sub-card">
+                    <div class="sub-card-top">
+                        <span class="sub-card-title">Sensor #1 (Logic / Bus 1)</span>
+                        <span id="ina1-addr" class="sub-label">0x40</span>
+                    </div>
+                    <div class="power-stats">
+                        <div>
+                            <div class="stat-caption">Bus Voltage</div>
+                            <div id="ina1-volt" class="stat-number">0.00 <span class="stat-unit">V</span></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="stat-caption">Current / Power</div>
+                            <div id="ina1-curr" class="font-mono" style="color: var(--accent-green); font-size: 15px; font-weight: 600;">0 mA</div>
+                            <div id="ina1-pwr" class="font-mono text-dim" style="font-size: 12px;">0.00 W</div>
+                        </div>
+                    </div>
+                    <canvas id="spark-volt" width="260" height="40" class="sparkline-canvas"></canvas>
+                </div>
+
+                <!-- Bus 2 (Motors) -->
+                <div class="sub-card">
+                    <div class="sub-card-top">
+                        <span class="sub-card-title">Sensor #2 (Motors / Bus 2)</span>
+                        <span id="ina2-addr" class="sub-label">0x41</span>
+                    </div>
+                    <div class="power-stats">
+                        <div>
+                            <div class="stat-caption">Bus Voltage</div>
+                            <div id="ina2-volt" class="stat-number">0.00 <span class="stat-unit">V</span></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="stat-caption">Current / Power</div>
+                            <div id="ina2-curr" class="font-mono" style="color: var(--accent-green); font-size: 15px; font-weight: 600;">0 mA</div>
+                            <div id="ina2-pwr" class="font-mono text-dim" style="font-size: 12px;">0.00 W</div>
+                        </div>
+                    </div>
+                    <canvas id="spark-pwr" width="260" height="40" class="sparkline-canvas"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. SYSTEM HEALTH & DIAGNOSTICS (Full Width) -->
+        <section class="card full-width">
+            <div class="card-header">
+                <h2>Hardware Diagnostics &amp; System Health</h2>
+                <span class="sub-label">ST-LINK USB VCP &bull; 115200 Baud</span>
+            </div>
+
+            <div class="diag-grid">
+                <div class="diag-tile">
+                    <div class="diag-lbl">MCU Uptime</div>
+                    <div id="diag-mcu-time" class="diag-v">0 ms</div>
+                </div>
+                <div class="diag-tile">
+                    <div class="diag-lbl">Throughput</div>
+                    <div id="diag-pkt-rate" class="diag-v text-green">0.0 Hz</div>
+                </div>
+                <div class="diag-tile">
+                    <div class="diag-lbl">Packets Ingested</div>
+                    <div id="diag-total-pkts" class="diag-v">0</div>
+                </div>
+                <div class="diag-tile">
+                    <div class="diag-lbl">Dropped Packets</div>
+                    <div id="diag-dropped" class="diag-v text-amber">0</div>
+                </div>
+                <div class="diag-tile">
+                    <div class="diag-lbl">CRC / Decode Errors</div>
+                    <div id="diag-errors" class="diag-v">0</div>
+                </div>
+                <div class="diag-tile">
+                    <div class="diag-lbl">Detected I2C Devices</div>
+                    <div id="diag-i2c-scan" class="diag-v text-cyan">Scanning...</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Clean Footer -->
+    <footer class="footer-strip">
+        <span id="footer-mon-time">MCU Clock: 0 ms</span>
+        <span>IIT Mandi Power Line Inspection Robot</span>
+        <span>WebSocket Telemetry: 20 Hz</span>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/static/js/attitude_gauge.js"></script>
+    <script src="/static/js/telemetry_charts.js"></script>
+    <script src="/static/js/monitor_app.js"></script>
+    <script>
+        const ctrlLink = document.getElementById('link-control');
+        if (ctrlLink) {
+            ctrlLink.href = `http://${window.location.hostname}:8002`;
+        }
+    </script>
+</body>
+</html>

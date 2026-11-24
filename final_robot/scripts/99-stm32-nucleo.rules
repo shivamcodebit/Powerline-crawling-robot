@@ -1,0 +1,11 @@
+# ==============================================================================
+# IIT Mandi Power Line Crawler Robot - Udev Rules for STM32 Nucleo ST-LINK
+# ==============================================================================
+# Creates stable symlink /dev/robot_stm32 and grants read/write permissions.
+
+# STMicroelectronics ST-LINK/V2.1 Virtual COM Port (Nucleo-F446RE)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", MODE="0666", GROUP="dialout", SYMLINK+="robot_stm32"
+
+# STMicroelectronics ST-LINK/V3 Virtual COM Port
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374e", MODE="0666", GROUP="dialout", SYMLINK+="robot_stm32"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0666", GROUP="dialout", SYMLINK+="robot_stm32"

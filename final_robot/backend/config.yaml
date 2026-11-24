@@ -1,0 +1,83 @@
+# ==============================================================================
+# IIT Mandi Power Line Crawler Robot - System Configuration
+# ==============================================================================
+
+# Serial Communication Settings
+serial:
+  port: "auto"                    # "auto", "COM9" (Windows), or "/dev/ttyACM0" (Raspberry Pi)
+  baudrate: 115200
+  timeout_sec: 0.1
+  reconnect_interval_sec: 1.5
+  heartbeat_interval_sec: 0.2     # 5 Hz heartbeat to keep STM32 watchdog fed
+
+# Safety & Watchdog Thresholds
+safety:
+  client_watchdog_timeout_sec: 2.0  # Safe client timeout (2.0s) avoiding browser timer jitter
+  firmware_watchdog_timeout_ms: 500 # STM32 firmware watchdog
+  require_neutral_to_arm: true
+  max_motor_speed_percent: 100
+
+# Motor Configuration & Direction Inversions
+# Note: Crawler A & B are mounted at opposite ends facing opposite directions
+motors:
+  crawler_a_inverted: false
+  crawler_b_inverted: true        # Inverted for reverse chassis orientation
+  gripper_a_inverted: false
+  gripper_b_inverted: false
+  deadband_percent: 2             # Ignore joystick noise within +/- 2%
+
+# Servo Safe Range Limits
+servos:
+  servo_1:
+    min_angle: 10
+    max_angle: 170
+    default_angle: 90
+    enabled: true
+  servo_2:
+    min_angle: 10
+    max_angle: 170
+    default_angle: 90
+    enabled: true
+
+# Quadrature Encoder Calibration Parameters
+# CPR set to 0.0 (uncalibrated) per project requirements
+encoders:
+  enc1:
+    name: "Crawler Wheel Motor A (300RPM + 3.6:1)"
+    cpr: 13.0                     # 13 PPR base encoder
+    gear_ratio: 216.0             # 60:1 internal x 3.6:1 external = 216:1 (11,232 CPR)
+    multiplier: 4
+  enc2:
+    name: "Crawler Wheel Motor B (300RPM + 3.6:1)"
+    cpr: 13.0                     # 13 PPR base encoder
+    gear_ratio: 216.0             # 60:1 internal x 3.6:1 external = 216:1 (11,232 CPR)
+    multiplier: 4
+  wenc1:
+    name: "Gripper Motor A Encoder (Robokits 100RPM)"
+    cpr: 13.0                     # 13 PPR base encoder
+    gear_ratio: 174.0             # 174:1 planetary gearbox (9,048 CPR)
+    multiplier: 4
+  wenc2:
+    name: "Gripper Motor B Encoder (Robokits 100RPM)"
+    cpr: 13.0                     # 13 PPR base encoder
+    gear_ratio: 174.0             # 174:1 planetary gearbox (9,048 CPR)
+    multiplier: 4
+
+# Camera Streaming Parameters
+camera:
+  enabled: true
+  backend: "auto"                 # "auto", "picamera2", "libcamera", "v4l2", "mock"
+  device_index: 0
+  width: 640
+  height: 480
+  fps: 24
+  jpeg_quality: 70
+  rotation: 180                   # 0, 90, 180, or 270 degrees
+  vflip: false                    # Vertical flip
+  hflip: false                    # Horizontal flip
+
+# Network Dashboard Ports
+servers:
+  host: "0.0.0.0"
+  control_port: 8002              # Dashboard 1: Robot Control
+  monitor_port: 8003              # Dashboard 2: Live Monitoring
